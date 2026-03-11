@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PM Internship Scheme - AI Recommendation</title>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="./src/styles/index.css">
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- React and ReactDOM CDNs (Development Build) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for in-browser JSX compilation -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- App Scripts (Compiled via Babel) -->
+    <script type="text/babel" data-type="module" src="./src/App.jsx"></script>
+    <script type="text/babel" data-type="module" src="./src/main.jsx"></script>
+    
+    <script>
+        // Initialize Lucide icons after mount
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                if (window.lucide) {
+                   lucide.createIcons();
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+frontend/node_modules/
+# Ignore node modules inside frontend
+frontend/node_modules/
+
+# Logs
+*.log
+
+# Environment variables
+.env
