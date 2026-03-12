@@ -14,9 +14,38 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 const SignUp = ({ onClose, onSwitchToSignIn }) => {
-  const [name, setName] = useState("")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleSignUp = async () => {
+    setError(null)
+    setIsLoading(true)
+
+    try {
+      const response = await fetch("http://localhost:8080/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ firstName, lastName, email, password }),
+      })
+
+      if (response.ok) {
+        // Switch to sign in on successful registration
+        onSwitchToSignIn()
+      } else {
+        setError("Registration failed. Email might already be in use.")
+      }
+    } catch (err) {
+      setError("Network error. Please try again later.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md animate-fade-in" onClick={onClose}>
@@ -29,15 +58,28 @@ const SignUp = ({ onClose, onSwitchToSignIn }) => {
           <CardDescription>Enter your details below to create your account</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              onChange={e => setName(e.target.value)}
-              placeholder="John Doe"
-              type="text"
-              value={name}
-            />
+          {error && <div className="text-red-500 text-sm">{error}</div>}
+          <div className="flex gap-4">
+            <div className="space-y-2 flex-1">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                onChange={e => setFirstName(e.target.value)}
+                placeholder="John"
+                type="text"
+                value={firstName}
+              />
+            </div>
+            <div className="space-y-2 flex-1">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                onChange={e => setLastName(e.target.value)}
+                placeholder="Doe"
+                type="text"
+                value={lastName}
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -58,7 +100,13 @@ const SignUp = ({ onClose, onSwitchToSignIn }) => {
               value={password}
             />
           </div>
-          <Button className="w-full bg-primary text-white hover:bg-primary-hover border-none">Sign Up</Button>
+          <Button 
+            className="w-full bg-primary text-white hover:bg-primary-hover border-none"
+            onClick={handleSignUp}
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing Up..." : "Sign Up"}
+          </Button>
           <Button className="w-full" variant="outline">
             Sign Up with Google
           </Button>

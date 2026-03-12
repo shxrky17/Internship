@@ -1,9 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
-
-
-const Header = ({ onOpenSignIn, onOpenSignUp }) => {
+const Header = ({ onOpenSignIn, onOpenSignUp, user, onLogout }) => {
   return (
     <header className="glass-nav">
       <div className="max-w-8xl mx-auto px-10 h-18 flex justify-between items-center py-4">
@@ -45,12 +43,35 @@ const Header = ({ onOpenSignIn, onOpenSignUp }) => {
           <button className="bg-transparent border-none text-text-muted cursor-pointer p-2 rounded-full transition-all duration-200 flex items-center justify-center hover:bg-slate-100 hover:text-primary" aria-label="Change Language">
             <i data-lucide="languages" className="w-5 h-5"></i>
           </button>
-          <button onClick={onOpenSignIn} className="btn btn-signin hidden sm:inline-flex py-2 px-4 ">
-             Sign In
-          </button>
-          <Button onClick={onOpenSignUp} variant="default" className="hidden sm:inline-flex py-2 px-4 bg-purple-500 hover:bg-purple-600 text-white rounded-full">
-             Sign Up
-          </Button>
+
+          {user ? (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm font-bold">
+                  {user.email.charAt(0).toUpperCase()}
+                </div>
+                <span className="text-sm font-medium text-slate-700 hidden sm:block max-w-[140px] truncate">
+                  {user.email}
+                </span>
+              </div>
+              <button
+                onClick={onLogout}
+                className="bg-transparent border border-slate-200 text-text-muted cursor-pointer py-1.5 px-3 rounded-full text-sm transition-all duration-200 hover:bg-red-50 hover:text-red-500 hover:border-red-200 hidden sm:flex items-center gap-1.5"
+              >
+                <i data-lucide="log-out" className="w-3.5 h-3.5"></i>
+                Logout
+              </button>
+            </div>
+          ) : (
+            <>
+              <button onClick={onOpenSignIn} className="btn btn-signin hidden sm:inline-flex py-2 px-4">
+                Sign In
+              </button>
+              <Button onClick={onOpenSignUp} variant="default" className="hidden sm:inline-flex py-2 px-4 bg-purple-500 hover:bg-purple-600 text-white rounded-full">
+                Sign Up
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>

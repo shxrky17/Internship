@@ -3,7 +3,7 @@ import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 
 const LandingView = ({ onStart }) => {
   return (
-    <div className="glass-panel max-w-7xl mx-auto mt-8 py-12 px-8 text-center bg-white/60">
+    <div className="glass-panel overflow-hidden max-w-7xl mx-auto mt-8 py-12 px-8 text-center bg-white/60">
       <div className="max-w-4xl mx-auto">
         <h2 className="text-4xl md:text-5xl mb-4 text-primary font-heading font-extrabold tracking-tight">
           Find Your Perfect Internship Match
