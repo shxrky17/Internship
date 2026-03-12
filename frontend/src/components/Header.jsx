@@ -7,13 +7,35 @@ const Header = ({ onOpenSignIn, onOpenSignUp }) => {
   return (
     <header className="glass-nav">
       <div className="max-w-8xl mx-auto px-10 h-18 flex justify-between items-center py-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-xl">
-            <i data-lucide="briefcase" className="w-5 h-5"></i>
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-xl">
+              <i data-lucide="briefcase" className="w-5 h-5"></i>
+            </div>
+            <div>
+              <h1 className="text-xl m-0 sm:text-base">PM Internship Scheme</h1>
+              <p className="text-xs text-text-muted m-0">AI Matching Portal</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl m-0 sm:text-base">PM Internship Scheme</h1>
-            <p className="text-xs text-text-muted m-0">AI Matching Portal</p>
+          <div className="flex items-center gap-10">
+            <div className="flex items-center gap-2 text-black font-semibold text-base cursor-pointer hover:text-primary transition-all group">
+              <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                <i data-lucide="home" className="w-4 h-4 text-primary"></i>
+              </div>
+              <p className="m-0 group-hover:text-primary">Home</p>
+            </div>
+            <div className="flex items-center gap-2 text-text-muted font-medium text-base cursor-pointer hover:text-primary transition-all group">
+              <div className="w-8 h-8 rounded-full bg-transparent group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                <i data-lucide="info" className="w-4 h-4 group-hover:text-primary"></i>
+              </div>
+              <p className="m-0 group-hover:text-primary">About</p>
+            </div>
+            <div className="flex items-center gap-2 text-text-muted font-medium text-base cursor-pointer hover:text-primary transition-all group">
+              <div className="w-8 h-8 rounded-full bg-transparent group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                <i data-lucide="phone" className="w-4 h-4 group-hover:text-primary"></i>
+              </div>
+              <p className="m-0 group-hover:text-primary">Contact</p>
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-4">
