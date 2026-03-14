@@ -1,12 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '../context/AuthContext';
 
-const Header = ({ onOpenSignIn, onOpenSignUp, user, onLogout }) => {
+const Header = ({ onOpenSignIn, onOpenSignUp, onLogout }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   return (
     <header className="glass-nav">
       <div className="max-w-8xl mx-auto px-10 h-18 flex justify-between items-center py-4">
         <div className="flex items-center gap-8">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-xl">
               <i data-lucide="briefcase" className="w-5 h-5"></i>
             </div>
@@ -16,12 +21,13 @@ const Header = ({ onOpenSignIn, onOpenSignUp, user, onLogout }) => {
             </div>
           </div>
           <div className="flex items-center gap-10">
-            <div className="flex items-center gap-2 text-black font-semibold text-base cursor-pointer hover:text-primary transition-all group">
+            <div onClick={() => navigate('/')} className="flex items-center gap-2 text-black font-semibold text-base cursor-pointer hover:text-primary transition-all group">
               <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
                 <i data-lucide="home" className="w-4 h-4 text-primary"></i>
               </div>
               <p className="m-0 group-hover:text-primary">Home</p>
             </div>
+
             <div className="flex items-center gap-2 text-text-muted font-medium text-base cursor-pointer hover:text-primary transition-all group">
               <div className="w-8 h-8 rounded-full bg-transparent group-hover:bg-primary/10 flex items-center justify-center transition-colors">
                 <i data-lucide="info" className="w-4 h-4 group-hover:text-primary"></i>
@@ -46,8 +52,10 @@ const Header = ({ onOpenSignIn, onOpenSignUp, user, onLogout }) => {
 
           {user ? (
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm font-bold">
+              <div 
+                className="flex items-center gap-2 p-1 rounded-full transition-colors"
+              >
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm font-bold shadow-sm">
                   {user.email.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-sm font-medium text-slate-700 hidden sm:block max-w-[140px] truncate">

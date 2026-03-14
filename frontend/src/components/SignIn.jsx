@@ -12,12 +12,14 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuth } from "../context/AuthContext"
 
-const SignIn = ({ onClose, onSwitchToSignUp, onLoginSuccess }) => {
+const SignIn = ({ onClose, onSwitchToSignUp, onLoginSuccess, onLoginError }) => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const { login } = useAuth();
 
   const handleSignIn = async () => {
     setError(null)
@@ -29,6 +31,7 @@ const SignIn = ({ onClose, onSwitchToSignUp, onLoginSuccess }) => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       })
 
@@ -36,23 +39,31 @@ const SignIn = ({ onClose, onSwitchToSignUp, onLoginSuccess }) => {
         const data = await response.json()
         // Backend field is named "success" in LoginResponseDTO
         if (data.success) {
+          await login(email);
           if (onLoginSuccess) onLoginSuccess(email)
           else onClose()
         } else {
-          setError(data.message || "Invalid credentials")
+          const errMsg = data.message || "Invalid credentials"
+          setError(errMsg)
+          if (onLoginError) onLoginError(errMsg)
         }
       } else {
-        setError("Login failed. Please check your credentials.")
+        const errMsg = "Login failed. Please check your credentials."
+        setError(errMsg)
+        if (onLoginError) onLoginError(errMsg)
       }
     } catch (err) {
-      setError("Cannot connect to server. Use Quick Test below, or start the backend.")
+      const errMsg = "Cannot connect to server. Please ensure backend is running."
+      setError(errMsg)
+      if (onLoginError) onLoginError(errMsg)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleQuickTest = () => {
+  const handleQuickTest = async () => {
     const testEmail = email.trim() || "test@example.com"
+    await login(testEmail);
     if (onLoginSuccess) onLoginSuccess(testEmail)
     else onClose()
   }

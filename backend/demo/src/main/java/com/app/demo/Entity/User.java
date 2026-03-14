@@ -15,7 +15,8 @@ public class User {
     private String lastName;
     private String email;
     private String password;
-
+    @OneToOne(mappedBy = "user")
+    private Profile profile;
     public Integer getId() {
         return id;
     }
