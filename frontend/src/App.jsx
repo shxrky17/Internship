@@ -6,6 +6,7 @@ import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import Marquee from "./components/Marquee";
 import AddDetails from "./components/AddDetails";
+import Footer from "./components/Footer";
 import Toast from "./components/Toast";
 import { useAuth } from './context/AuthContext';
 
@@ -60,8 +61,10 @@ const AppContent = () => {
                 onLogout={handleLogout}
               />
               <div className={authModal ? "blur-sm transition-all duration-300" : "transition-all duration-300"}>
+                
                 <LandingView onOpenSignIn={() => setAuthModal('signin')} />
                 <Marquee />
+                <Footer />
               </div>
 
               {authModal === 'signin' && (

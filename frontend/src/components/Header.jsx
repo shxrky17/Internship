@@ -6,6 +6,20 @@ import { useAuth } from '../context/AuthContext';
 const Header = ({ onOpenSignIn, onOpenSignUp, onLogout }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  const handleScrollTo = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/');
+      // Wait for navigation and then scroll
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
 
   return (
     <header className="glass-nav">
@@ -28,13 +42,13 @@ const Header = ({ onOpenSignIn, onOpenSignUp, onLogout }) => {
               <p className="m-0 group-hover:text-primary">Home</p>
             </div>
 
-            <div className="flex items-center gap-2 text-text-muted font-medium text-base cursor-pointer hover:text-primary transition-all group">
+            <div onClick={() => handleScrollTo('about')} className="flex items-center gap-2 text-text-muted font-medium text-base cursor-pointer hover:text-primary transition-all group">
               <div className="w-8 h-8 rounded-full bg-transparent group-hover:bg-primary/10 flex items-center justify-center transition-colors">
                 <i data-lucide="info" className="w-4 h-4 group-hover:text-primary"></i>
               </div>
               <p className="m-0 group-hover:text-primary">About</p>
             </div>
-            <div className="flex items-center gap-2 text-text-muted font-medium text-base cursor-pointer hover:text-primary transition-all group">
+            <div onClick={() => handleScrollTo('contact')} className="flex items-center gap-2 text-text-muted font-medium text-base cursor-pointer hover:text-primary transition-all group">
               <div className="w-8 h-8 rounded-full bg-transparent group-hover:bg-primary/10 flex items-center justify-center transition-colors">
                 <i data-lucide="phone" className="w-4 h-4 group-hover:text-primary"></i>
               </div>
