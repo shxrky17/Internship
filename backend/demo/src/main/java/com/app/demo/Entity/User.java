@@ -13,10 +13,13 @@ public class User {
     private Integer id;
     private String firstName;
     private String lastName;
+    @Column(unique = true, nullable = false)
     private String email;
     private String password;
+
     @OneToOne(mappedBy = "user")
     private Profile profile;
+
     public Integer getId() {
         return id;
     }

@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const ProfileDashboard = ({ user, profile, onOpenSignIn, showToast }) => {
+const ProfileDashboard = ({ user, profile, isInitializing, onOpenSignIn, showToast }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (isInitializing) return; // Wait for initial profile fetch attempt
+
     if (!user) {
       showToast('Please login to view your dashboard.', 'warning');
       navigate('/');
@@ -13,7 +15,7 @@ const ProfileDashboard = ({ user, profile, onOpenSignIn, showToast }) => {
       showToast('No profile found. Please add your details first.', 'info');
       navigate('/add-details');
     }
-  }, [user, profile, navigate, onOpenSignIn, showToast]);
+  }, [user, profile, navigate, onOpenSignIn, showToast, isInitializing]);
 
   if (!user || !profile) return null;
 
@@ -28,10 +30,12 @@ const ProfileDashboard = ({ user, profile, onOpenSignIn, showToast }) => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-              {user.email.charAt(0).toUpperCase()}
+              {(user.firstName || user.email).charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">Professional Profile</h1>
+              <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">
+                {user.firstName ? `${user.firstName} ${user.lastName}'s Profile` : 'Professional Profile'}
+              </h1>
               <p className="text-slate-500">{user.email}</p>
             </div>
           </div>

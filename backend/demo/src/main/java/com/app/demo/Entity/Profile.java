@@ -1,6 +1,7 @@
 package com.app.demo.Entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Profile {
@@ -21,8 +22,9 @@ public class Profile {
     private String languages;
     private String bio;
 
-    @OneToOne
-    @JoinColumn(name="user_id")
+    @JsonIgnore
+    @OneToOne(optional = false)
+    @JoinColumn(name="user_id", unique = true)
     private User user;
 
     public User getUser() {
@@ -143,5 +145,26 @@ public class Profile {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public Profile() {
+    }
+
+    public Profile(Integer id, String dob, String phoneNumber, String gender, String district, String cv, String state, String highestQualification, String fieldOfStudy, String gradYear, String clgName, String skills, String languages, String bio, User user) {
+        this.id = id;
+        this.dob = dob;
+        this.phoneNumber = phoneNumber;
+        this.gender = gender;
+        this.district = district;
+        this.cv = cv;
+        this.state = state;
+        this.highestQualification = highestQualification;
+        this.fieldOfStudy = fieldOfStudy;
+        this.gradYear = gradYear;
+        this.clgName = clgName;
+        this.skills = skills;
+        this.languages = languages;
+        this.bio = bio;
+        this.user = user;
     }
 }

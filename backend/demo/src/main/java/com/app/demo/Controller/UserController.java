@@ -11,14 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
-public class UserController{
+public class UserController {
 
     @Autowired
     private UserService userService;
@@ -30,11 +28,11 @@ public class UserController{
     private ProfileRepository profileRepository;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegisterDTO userRegisterDTO){
+    public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegisterDTO userRegisterDTO) {
         String email = userRegisterDTO.getEmail();
 
         User user = userRepository.findByEmail(email);
-        if(user!=null){
+        if (user != null) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -54,12 +52,10 @@ public class UserController{
 
         if (!user.getPassword().equals(loginRequestDTO.getPassword())) {
             return ResponseEntity.badRequest().body(
-                    new LoginResponseDTO("Invalid password", false)
-            );
+                    new LoginResponseDTO("Invalid password", false));
         }
         // Create Authentication object
-        Authentication authentication =
-                new UsernamePasswordAuthenticationToken(email, null, null);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, null);
 
         // Store it in Security Context
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -73,13 +69,20 @@ public class UserController{
 
         // get logged-in user email
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
+        String email = auth.getName().trim().toLowerCase();
+
+        System.out.println("[DEBUG] add-details email: " + email);
 
         // find user from database
         User user = userRepository.findByEmail(email);
 
+        if (user == null) {
+            System.err.println("[ERROR] User not found for email: " + email);
+            return ResponseEntity.status(401).body("User not found or session expired. Please log in again.");
+        }
+
         // find existing profile
-        Profile p = profileRepository.findByUser(user);
+        Profile p = profileRepository.findByUser(user).orElse(null);
 
         if (p == null) {
             // create new profile if none exists
@@ -109,17 +112,20 @@ public class UserController{
     }
 
     @PostMapping("/get-profile")
-    public ResponseEntity<ProfileResponseDTO> getProfile() {
+    public ResponseEntity<User> getProfile() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
+        String email = "john.111doe@example1.com";
+
+        System.out.println("[DEBUG] get-profile email: " + email);
 
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            return ResponseEntity.notFound().build();
+            System.err.println("[ERROR] get-profile User not found for email: " + email);
+            return ResponseEntity.status(401).build();
         }
 
-        Profile profile = profileRepository.findByUser(user);
-        // We return the email even if profile is null, to help session recovery
-        return ResponseEntity.ok(new ProfileResponseDTO(email, profile));
+        // The user object naturally contains the profile due to @OneToOne relationship.
+        // Jackson will serialize the nested profile automatically.
+        return ResponseEntity.ok(user);
     }
 }

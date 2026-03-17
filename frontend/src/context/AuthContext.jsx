@@ -3,8 +3,19 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children, showToast }) => {
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  const [profile, setProfile] = useState(() => {
+    const cachedProfile = localStorage.getItem('cached_profile');
+    try {
+      return cachedProfile ? JSON.parse(cachedProfile) : null;
+    } catch (e) {
+      console.error('Error parsing cached profile:', e);
+      return null;
+    }
+  });
   const [isInitializing, setIsInitializing] = useState(true);
 
   const fetchProfile = async () => {
@@ -15,10 +26,33 @@ export const AuthProvider = ({ children, showToast }) => {
         credentials: 'include',
       });
       if (response.ok) {
-        const { email, profile: profileData } = await response.json();
-        setUser({ email });
-        setProfile(profileData);
-        return { email, profile: profileData };
+        let data;
+        try {
+          data = await response.json();
+        } catch (e) {
+          console.error('Error parsing JSON:', e);
+          return null;
+        }
+
+        const { email, firstName, lastName, profile: profileData } = data || {};
+        if (email) {
+          const userData = { 
+            email: email.trim().toLowerCase(),
+            firstName: firstName || '',
+            lastName: lastName || ''
+          };
+          setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
+          
+          if (profileData) {
+            // Cache full profile for immediate dashboard rendering
+            localStorage.setItem('cached_profile', JSON.stringify(profileData));
+          } else {
+             localStorage.removeItem('cached_profile');
+          }
+          setProfile(profileData || null);
+          return { ...userData, profile: profileData || null };
+        }
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -39,13 +73,17 @@ export const AuthProvider = ({ children, showToast }) => {
   }, []);
 
   const login = async (email) => {
-    setUser({ email });
+    const userData = { email };
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
     await fetchProfile();
   };
 
   const logout = () => {
     setUser(null);
     setProfile(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('cached_profile');
   };
 
   const updateProfile = async (newProfileData) => {

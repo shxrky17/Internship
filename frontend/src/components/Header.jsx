@@ -54,6 +54,15 @@ const Header = ({ onOpenSignIn, onOpenSignUp, onLogout }) => {
               </div>
               <p className="m-0 group-hover:text-primary">Contact</p>
             </div>
+
+            {user && (
+              <div onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-black font-semibold text-base cursor-pointer hover:text-primary transition-all group">
+                <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                  <i data-lucide="layout-dashboard" className="w-4 h-4 text-primary"></i>
+                </div>
+                <p className="m-0 group-hover:text-primary">Dashboard</p>
+              </div>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-4">

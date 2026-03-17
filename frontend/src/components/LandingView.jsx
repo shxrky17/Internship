@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import GalleryCarousel from './GalleryCarousel';
-import Marquee from './Marquee';
 
 const LandingView = ({ onOpenSignIn }) => {
   const navigate = useNavigate();
@@ -77,7 +76,6 @@ const LandingView = ({ onOpenSignIn }) => {
         </div>
 
       </div>
-<Marquee />
       {/* About Section */}
       <div id="about" className="mt-24 pt-12 border-t border-slate-200/60 max-w-5xl mx-auto">
         <div className="flex flex-col md:flex-row items-center gap-12 text-left">
