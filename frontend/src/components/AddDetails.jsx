@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { 
+  ArrowLeft, 
+  User, 
+  MapPin, 
+  GraduationCap, 
+  Zap, 
+  Save, 
+  Check, 
+  Upload, 
+  FileCheck 
+} from 'lucide-react';
 
 const AddDetails = ({ onOpenSignIn, showToast }) => {
   const navigate = useNavigate();
@@ -21,6 +32,18 @@ const AddDetails = ({ onOpenSignIn, showToast }) => {
     skills: '',
     languages: '',
     bio: '',
+  });
+
+  const [files, setFiles] = useState({
+    resume: null,
+    marksheet10: null,
+    marksheet12ITI: null,
+  });
+
+  const [uploadingStates, setUploadingStates] = useState({
+    resume: { idle: true },
+    marksheet10: { idle: true },
+    marksheet12ITI: { idle: true },
   });
 
   useEffect(() => {
@@ -57,6 +80,60 @@ const AddDetails = ({ onOpenSignIn, showToast }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    const fieldName = e.target.name;
+    const file = e.target.files[0];
+    setFiles({ ...files, [fieldName]: file });
+    // Reset status when file changes
+    setUploadingStates(prev => ({ ...prev, [fieldName]: { idle: true } }));
+  };
+
+  const handleInstantUpload = async (fieldName) => {
+    const file = files[fieldName];
+    if (!file) {
+      showToast('Please select a file first.', 'warning');
+      return;
+    }
+
+    setUploadingStates(prev => ({ ...prev, [fieldName]: { loading: true } }));
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('documentType', fieldName);
+
+    try {
+      const response = await fetch('http://localhost:8080/upload-document', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (response.ok) {
+        showToast('Document uploaded successfully!', 'success');
+        setUploadingStates(prev => ({ ...prev, [fieldName]: { success: true } }));
+        // Optionally update the context profile path
+        const filePath = await response.text();
+        
+        // Sync form state
+        if (fieldName === 'resume') setForm(prev => ({ ...prev, cv: filePath }));
+        
+        // Merge with existing profile or create new shell
+        const updatedProfile = { ...(profile || {}) };
+        if (fieldName === 'resume') updatedProfile.cv = filePath;
+        else if (fieldName === 'marksheet10') updatedProfile.marksheet10 = filePath;
+        else if (fieldName === 'marksheet12ITI') updatedProfile.marksheet12ITI = filePath;
+        updateProfile(updatedProfile);
+      } else {
+        const error = await response.text();
+        showToast(`Upload failed: ${error}`, 'error');
+        setUploadingStates(prev => ({ ...prev, [fieldName]: { idle: true } }));
+      }
+    } catch (error) {
+      showToast('Connection error during upload.', 'error');
+      setUploadingStates(prev => ({ ...prev, [fieldName]: { idle: true } }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -77,19 +154,24 @@ const AddDetails = ({ onOpenSignIn, showToast }) => {
       bio: form.bio,
     };
 
+    const formData = new FormData();
+    formData.append('profile', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+    
+    if (files.resume) formData.append('resume', files.resume);
+    if (files.marksheet10) formData.append('marksheet10', files.marksheet10);
+    if (files.marksheet12ITI) formData.append('marksheet12ITI', files.marksheet12ITI);
+
     try {
       const response = await fetch('http://localhost:8080/add-details', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         credentials: 'include',
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       if (response.ok) {
         showToast(profile ? 'Profile updated successfully!' : 'Profile created successfully!', 'success');
-        await updateProfile(payload);
+        // Merge current form data with existing profile to ensure paths aren't lost
+        await updateProfile({ ...(profile || {}), ...payload });
         navigate('/');
       } else {
         const errorText = await response.text();
@@ -118,7 +200,7 @@ const AddDetails = ({ onOpenSignIn, showToast }) => {
           onClick={() => navigate('/')}
           className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors bg-white/70 border border-slate-200 rounded-full px-4 py-2"
         >
-          <i data-lucide="arrow-left" className="w-4 h-4"></i>
+          <ArrowLeft className="w-4 h-4" />
           Back to Home
         </button>
         <div>
@@ -131,7 +213,7 @@ const AddDetails = ({ onOpenSignIn, showToast }) => {
         {/* Personal & Contact */}
         <div className="glass-panel p-6 rounded-2xl">
           <h2 className={sectionHeadingClass}>
-            <i data-lucide="user" className="w-5 h-5"></i>
+            <User className="w-5 h-5" />
             Personal & Contact Details
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -153,8 +235,81 @@ const AddDetails = ({ onOpenSignIn, showToast }) => {
               </select>
             </div>
             <div>
-              <label className={labelClass}>CV Link (URL)</label>
-              <input name="cv" value={form.cv} onChange={handleChange} placeholder="https://drive.google.com/..." className={inputClass} />
+              <label className={labelClass}>Resume / CV (PDF)</label>
+              <div className="flex gap-2">
+                <input name="resume" type="file" accept=".pdf" onChange={handleFileChange} className={inputClass} />
+                <button 
+                  type="button" 
+                  onClick={() => handleInstantUpload('resume')}
+                  disabled={uploadingStates.resume.loading || !files.resume}
+                  className={`px-4 rounded-xl border font-bold text-xs transition-all flex items-center gap-1 shrink-0 ${
+                    uploadingStates.resume.success 
+                      ? 'bg-green-50 border-green-200 text-green-600' 
+                      : 'bg-primary/5 border-primary/20 text-primary hover:bg-primary/10'
+                  }`}
+                >
+                  {uploadingStates.resume.loading ? (
+                    <span className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+                  ) : uploadingStates.resume.success ? (
+                    <><Check className="w-3 h-3" /> Done</>
+                  ) : (
+                    <><Upload className="w-3 h-3" /> Upload</>
+                  )}
+                </button>
+              </div>
+              {profile?.cv && <p className="text-[10px] text-green-600 font-medium mt-1 flex items-center gap-1"><FileCheck className="w-3 h-3" /> Previously uploaded</p>}
+            </div>
+
+            <div>
+              <label className={labelClass}>10th Marksheet (PDF)</label>
+              <div className="flex gap-2">
+                <input name="marksheet10" type="file" accept=".pdf" onChange={handleFileChange} className={inputClass} />
+                <button 
+                  type="button" 
+                  onClick={() => handleInstantUpload('marksheet10')}
+                  disabled={uploadingStates.marksheet10.loading || !files.marksheet10}
+                  className={`px-4 rounded-xl border font-bold text-xs transition-all flex items-center gap-1 shrink-0 ${
+                    uploadingStates.marksheet10.success 
+                      ? 'bg-green-50 border-green-200 text-green-600' 
+                      : 'bg-primary/5 border-primary/20 text-primary hover:bg-primary/10'
+                  }`}
+                >
+                  {uploadingStates.marksheet10.loading ? (
+                    <span className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+                  ) : uploadingStates.marksheet10.success ? (
+                    <><Check className="w-3 h-3" /> Done</>
+                  ) : (
+                    <><Upload className="w-3 h-3" /> Upload</>
+                  )}
+                </button>
+              </div>
+              {profile?.marksheet10 && <p className="text-[10px] text-green-600 font-medium mt-1 flex items-center gap-1"><FileCheck className="w-3 h-3" /> Previously uploaded</p>}
+            </div>
+
+            <div>
+              <label className={labelClass}>12th / ITI Marksheet (PDF)</label>
+              <div className="flex gap-2">
+                <input name="marksheet12ITI" type="file" accept=".pdf" onChange={handleFileChange} className={inputClass} />
+                <button 
+                  type="button" 
+                  onClick={() => handleInstantUpload('marksheet12ITI')}
+                  disabled={uploadingStates.marksheet12ITI.loading || !files.marksheet12ITI}
+                  className={`px-4 rounded-xl border font-bold text-xs transition-all flex items-center gap-1 shrink-0 ${
+                    uploadingStates.marksheet12ITI.success 
+                      ? 'bg-green-50 border-green-200 text-green-600' 
+                      : 'bg-primary/5 border-primary/20 text-primary hover:bg-primary/10'
+                  }`}
+                >
+                  {uploadingStates.marksheet12ITI.loading ? (
+                    <span className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+                  ) : uploadingStates.marksheet12ITI.success ? (
+                    <><Check className="w-3 h-3" /> Done</>
+                  ) : (
+                    <><Upload className="w-3 h-3" /> Upload</>
+                  )}
+                </button>
+              </div>
+              {profile?.marksheet12ITI && <p className="text-[10px] text-green-600 font-medium mt-1 flex items-center gap-1"><FileCheck className="w-3 h-3" /> Previously uploaded</p>}
             </div>
           </div>
         </div>
@@ -162,7 +317,7 @@ const AddDetails = ({ onOpenSignIn, showToast }) => {
         {/* Location */}
         <div className="glass-panel p-6 rounded-2xl">
           <h2 className={sectionHeadingClass}>
-            <i data-lucide="map-pin" className="w-5 h-5"></i>
+            <MapPin className="w-5 h-5" />
             Location
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -180,7 +335,7 @@ const AddDetails = ({ onOpenSignIn, showToast }) => {
         {/* Education */}
         <div className="glass-panel p-6 rounded-2xl">
           <h2 className={sectionHeadingClass}>
-            <i data-lucide="graduation-cap" className="w-5 h-5"></i>
+            <GraduationCap className="w-5 h-5" />
             Education
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -206,7 +361,7 @@ const AddDetails = ({ onOpenSignIn, showToast }) => {
         {/* Skills & Bio */}
         <div className="glass-panel p-6 rounded-2xl">
           <h2 className={sectionHeadingClass}>
-            <i data-lucide="zap" className="w-5 h-5"></i>
+            <Zap className="w-5 h-5" />
             Skills & Bio
           </h2>
           <div className="space-y-4">
@@ -252,7 +407,7 @@ const AddDetails = ({ onOpenSignIn, showToast }) => {
             {isSubmitting ? (
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
             ) : (
-              <i data-lucide="save" className="w-4 h-4"></i>
+              <Save className="w-4 h-4" />
             )}
             {isSubmitting ? 'Saving...' : 'Save Profile'}
           </button>

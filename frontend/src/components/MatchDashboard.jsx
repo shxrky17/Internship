@@ -1,4 +1,13 @@
 import React from 'react';
+import { 
+  MapPin, 
+  Edit3, 
+  Zap, 
+  Check, 
+  Building, 
+  Banknote, 
+  Info 
+} from 'lucide-react';
 
 const MatchDashboard = ({ profile, onReset }) => {
   // Mock Data mimicking AI Matching Output
@@ -15,12 +24,12 @@ const MatchDashboard = ({ profile, onReset }) => {
             <h2 className="text-3xl font-heading font-bold text-text-main mb-2">Recommended Matches</h2>
             <p className="text-text-muted font-medium flex items-center gap-2 flex-wrap">
                <span className="bg-slate-200/50 px-2 py-1 rounded text-sm">{profile.education}</span> • 
-               <span className="bg-slate-200/50 px-2 py-1 rounded text-sm"><i data-lucide="map-pin" className="inline w-3 h-3"></i> {profile.location}</span> • 
+               <span className="bg-slate-200/50 px-2 py-1 rounded text-sm"><MapPin className="inline w-3 h-3" /> {profile.location}</span> • 
                <span className="bg-slate-200/50 px-2 py-1 rounded text-sm">{profile.skills.length} skills</span>
             </p>
          </div>
          <button className="btn btn-secondary px-5 py-2 text-sm" onClick={onReset}>
-            <i data-lucide="edit-3" className="w-4 h-4"></i> Edit Profile
+            <Edit3 className="w-4 h-4" /> Edit Profile
          </button>
       </div>
 
@@ -35,17 +44,17 @@ const MatchDashboard = ({ profile, onReset }) => {
                      px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1
                      ${job.match > 90 ? 'bg-emerald-100/50 text-emerald-600' : job.match > 80 ? 'bg-amber-100/50 text-amber-600' : 'bg-blue-100/50 text-primary'}
                    `}>
-                     <i data-lucide={job.match > 90 ? "zap" : "check"} className="w-3.5 h-3.5"></i>
+                     {job.match > 90 ? <Zap className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
                      {job.match}% AI Match
                    </span>
                 </div>
                 <div className="flex gap-6 text-text-muted text-sm mb-4 flex-wrap font-medium">
-                   <span className="flex items-center gap-1.5"><i data-lucide="building" className="w-4 h-4 text-slate-400"></i> {job.company}</span>
-                   <span className="flex items-center gap-1.5"><i data-lucide="map-pin" className="w-4 h-4 text-slate-400"></i> {job.location}</span>
-                   <span className="flex items-center gap-1.5"><i data-lucide="banknote" className="w-4 h-4 text-slate-400"></i> {job.stipend}</span>
+                   <span className="flex items-center gap-1.5"><Building className="w-4 h-4 text-slate-400" /> {job.company}</span>
+                   <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-slate-400" /> {job.location}</span>
+                   <span className="flex items-center gap-1.5"><Banknote className="w-4 h-4 text-slate-400" /> {job.stipend}</span>
                 </div>
                 <p className="text-sm text-slate-700 flex items-center gap-2 bg-blue-50/50 p-2.5 rounded-lg border border-blue-100/50 w-fit">
-                   <i data-lucide="info" className="w-4 h-4 text-primary"></i> <span className="font-medium">{job.highlight}</span>
+                   <Info className="w-4 h-4 text-primary" /> <span className="font-medium">{job.highlight}</span>
                 </p>
              </div>
 

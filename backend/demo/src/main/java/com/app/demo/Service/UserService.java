@@ -22,7 +22,7 @@ public class UserService {
         user.setId(userRegisterDTO.getId());
         user.setFirstName(userRegisterDTO.getFirstName());
         user.setLastName(userRegisterDTO.getLastName());
-        user.setEmail(userRegisterDTO.getEmail());
+        user.setEmail(userRegisterDTO.getEmail().trim().toLowerCase());
         user.setPassword(userRegisterDTO.getPassword());
         User savedUser=userRepository.save(user);
 

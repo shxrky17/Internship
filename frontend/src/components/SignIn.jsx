@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -72,7 +73,7 @@ const SignIn = ({ onClose, onSwitchToSignUp, onLoginSuccess, onLoginError }) => 
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md animate-fade-in" onClick={onClose}>
       <Card className="w-full glass-panel mx-auto max-w-md shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
         <button className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors" onClick={onClose}>
-          <i data-lucide="x" className="w-5 h-5"></i>
+          <X className="w-5 h-5" />
         </button>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>

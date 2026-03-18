@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Navigation, Check, ArrowRight } from 'lucide-react';
 
 const ProfileWizard = ({ onComplete }) => {
   const [step, setStep] = useState(1);
@@ -64,7 +65,7 @@ const ProfileWizard = ({ onComplete }) => {
              onChange={(e) => setProfile({...profile, location: e.target.value})}
            />
            <button className="btn btn-secondary justify-start p-4 hover:bg-slate-100 transition-colors" onClick={() => setProfile({...profile, location: 'Current Location'})}>
-             <i data-lucide="navigation" className="w-5 h-5 text-text-muted"></i> Use Current Location
+             <Navigation className="w-5 h-5 text-text-muted" /> Use Current Location
            </button>
         </div>
       )}
@@ -78,7 +79,7 @@ const ProfileWizard = ({ onComplete }) => {
               onClick={() => toggleSkill(skill)}
             >
               {skill}
-              {profile.skills.includes(skill) && <i data-lucide="check" className="w-4 h-4 ml-1"></i>}
+              {profile.skills.includes(skill) && <Check className="w-4 h-4 ml-1" />}
             </button>
           ))}
         </div>
@@ -100,7 +101,7 @@ const ProfileWizard = ({ onComplete }) => {
             (step === 3 && profile.skills.length === 0)
           }
         >
-          {step === 3 ? 'Find Matches' : 'Next'} <i data-lucide="arrow-right" className="w-5 h-5"></i>
+          {step === 3 ? 'Find Matches' : 'Next'} <ArrowRight className="w-5 h-5" />
         </button>
       </div>
     </div>

@@ -2,6 +2,18 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import GalleryCarousel from './GalleryCarousel';
+import { 
+  Sparkles, 
+  Search, 
+  Target, 
+  MapPin, 
+  CheckCircle, 
+  UserPen, 
+  ArrowRight, 
+  Info, 
+  Mail, 
+  Phone 
+} from 'lucide-react';
 
 const LandingView = ({ onOpenSignIn }) => {
   const navigate = useNavigate();
@@ -35,27 +47,27 @@ const LandingView = ({ onOpenSignIn }) => {
 
         <div className="flex gap-4 justify-center flex-wrap mb-12">
           <button onClick={handleApplyClick} className="btn btn-primary text-lg px-8 py-4">
-            <i data-lucide="sparkles" className="w-5 h-5"></i> 
+            <Sparkles className="w-5 h-5" /> 
             Find Matches Now
           </button>
           <button className="btn btn-secondary text-lg px-8 py-4">
-            <i data-lucide="search" className="w-5 h-5"></i> Browse All Rolls
+            <Search className="w-5 h-5" /> Browse All Rolls
           </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
           <div className="glass-panel p-6">
-            <i data-lucide="target" className="text-primary mb-4 w-8 h-8"></i>
+            <Target className="text-primary mb-4 w-8 h-8" />
             <h3 className="mb-2 text-xl font-bold">Smart Matching</h3>
             <p className="text-sm text-text-muted">Get personalized recommendations based on your unique profile.</p>
           </div>
           <div className="glass-panel p-6">
-            <i data-lucide="map-pin" className="text-secondary mb-4 w-8 h-8"></i>
+            <MapPin className="text-secondary mb-4 w-8 h-8" />
             <h3 className="mb-2 text-xl font-bold">Local Opportunities</h3>
             <p className="text-sm text-text-muted">Find internships near your home or preferred district easily.</p>
           </div>
           <div className="glass-panel p-6">
-            <i data-lucide="check-circle" className="text-amber-500 mb-4 w-8 h-8"></i>
+            <CheckCircle className="text-amber-500 mb-4 w-8 h-8" />
             <h3 className="mb-2 text-xl font-bold">Simple Process</h3>
             <p className="text-sm text-text-muted">No complex forms. Just tell us what you know, and we do the hard work.</p>
           </div>
@@ -64,13 +76,13 @@ const LandingView = ({ onOpenSignIn }) => {
             onClick={handleProfileCardClick}
           >
             
-            <i data-lucide="user-pen" className="text-purple-500 mb-4 w-8 h-8 group-hover:scale-110 transition-transform"></i>
+            <UserPen className="text-purple-500 mb-4 w-8 h-8 group-hover:scale-110 transition-transform" />
             <h3 className="mb-2 text-xl font-bold group-hover:text-primary transition-colors">
               Update Your Profile
             </h3>
             <p className="text-sm text-text-muted">Add your education, skills, and location to get better matches.</p>
             <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
-              Add Details <i data-lucide="arrow-right" className="w-3 h-3"></i>
+              Add Details <ArrowRight className="w-3 h-3" />
             </span>
           </div>
         </div>
@@ -81,7 +93,7 @@ const LandingView = ({ onOpenSignIn }) => {
         <div className="flex flex-col md:flex-row items-center gap-12 text-left">
           <div className="flex-1">
             <h2 className="text-3xl font-heading font-bold mb-6 text-primary flex items-center gap-2">
-              <i data-lucide="info" className="w-8 h-8"></i>
+              <Info className="w-8 h-8" />
               About the Scheme
             </h2>
             <p className="text-text-muted mb-4 leading-relaxed">
@@ -115,21 +127,21 @@ const LandingView = ({ onOpenSignIn }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
           <div className="glass-panel p-8 text-center hover:shadow-xl transition-all border-b-4 border-primary">
             <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i data-lucide="mail" className="text-primary w-6 h-6"></i>
+              <Mail className="text-primary w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold mb-2">Email Us</h3>
             <p className="text-sm text-text-muted">support@pminternship.gov.in</p>
           </div>
           <div className="glass-panel p-8 text-center hover:shadow-xl transition-all border-b-4 border-secondary">
             <div className="w-14 h-14 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i data-lucide="phone" className="text-secondary w-6 h-6"></i>
+              <Phone className="text-secondary w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold mb-2">Call Support</h3>
             <p className="text-sm text-text-muted">+91 012-3456789</p>
           </div>
           <div className="glass-panel p-8 text-center hover:shadow-xl transition-all border-b-4 border-amber-400">
             <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i data-lucide="map-pin" className="text-amber-500 w-6 h-6"></i>
+              <MapPin className="text-amber-500 w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold mb-2">Visit Office</h3>
             <p className="text-sm text-text-muted">New Delhi, India</p>

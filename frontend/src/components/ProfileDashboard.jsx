@@ -1,5 +1,16 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  User, 
+  UserPen, 
+  GraduationCap, 
+  Sparkles, 
+  Contact, 
+  Map, 
+  FileText, 
+  FileCheck, 
+  FileBadge 
+} from 'lucide-react';
 
 const ProfileDashboard = ({ user, profile, isInitializing, onOpenSignIn, showToast }) => {
   const navigate = useNavigate();
@@ -43,7 +54,7 @@ const ProfileDashboard = ({ user, profile, isInitializing, onOpenSignIn, showToa
             onClick={() => navigate('/add-details')}
             className="btn btn-primary px-6 py-2.5 flex items-center gap-2 shadow-md hover:shadow-lg transition-all"
           >
-            <i data-lucide="user-pen" className="w-4 h-4"></i>
+            <UserPen className="w-4 h-4" />
             Edit Profile
           </button>
         </div>
@@ -55,7 +66,7 @@ const ProfileDashboard = ({ user, profile, isInitializing, onOpenSignIn, showToa
             {/* Bio Section */}
             <div className={sectionClass}>
               <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i data-lucide="user" className="w-5 h-5 text-primary"></i>
+                <User className="w-5 h-5 text-primary" />
                 About Me
               </h3>
               <p className="text-slate-600 leading-relaxed italic border-l-4 border-primary/20 pl-4 py-1">
@@ -66,7 +77,7 @@ const ProfileDashboard = ({ user, profile, isInitializing, onOpenSignIn, showToa
             {/* Education */}
             <div className={sectionClass}>
               <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i data-lucide="graduation-cap" className="w-5 h-5 text-primary"></i>
+                <GraduationCap className="w-5 h-5 text-primary" />
                 Education
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
@@ -92,7 +103,7 @@ const ProfileDashboard = ({ user, profile, isInitializing, onOpenSignIn, showToa
             {/* Skills */}
             <div className={sectionClass}>
               <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i data-lucide="sparkles" className="w-5 h-5 text-primary"></i>
+                <Sparkles className="w-5 h-5 text-primary" />
                 Skills & Languages
               </h3>
               <div className="space-y-4">
@@ -124,7 +135,7 @@ const ProfileDashboard = ({ user, profile, isInitializing, onOpenSignIn, showToa
           <div className="space-y-6">
             <div className={sectionClass}>
               <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i data-lucide="contact" className="w-5 h-5 text-secondary"></i>
+                <Contact className="w-5 h-5 text-secondary" />
                 Contact Info
               </h3>
               <div className="space-y-4">
@@ -145,7 +156,7 @@ const ProfileDashboard = ({ user, profile, isInitializing, onOpenSignIn, showToa
 
             <div className={sectionClass}>
               <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i data-lucide="map" className="w-5 h-5 text-amber-500"></i>
+                <Map className="w-5 h-5 text-amber-500" />
                 Location
               </h3>
               <div className="space-y-4">
@@ -162,13 +173,37 @@ const ProfileDashboard = ({ user, profile, isInitializing, onOpenSignIn, showToa
 
             {profile.cv && (
               <a 
-                href={profile.cv} 
+                href={`http://localhost:8080${profile.cv}`} 
                 target="_blank" 
                 rel="noreferrer"
                 className="block w-full text-center px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold hover:bg-slate-50 transition-colors shadow-sm"
               >
-                <i data-lucide="file-text" className="w-4 h-4 inline-block mr-2"></i>
+                <FileText className="w-4 h-4 inline-block mr-2" />
                 View CV / Resume
+              </a>
+            )}
+
+            {profile.marksheet10 && (
+              <a 
+                href={`http://localhost:8080${profile.marksheet10}`} 
+                target="_blank" 
+                rel="noreferrer"
+                className="block w-full text-center px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold hover:bg-slate-50 transition-colors shadow-sm"
+              >
+                <FileCheck className="w-4 h-4 inline-block mr-2 text-primary" />
+                10th Marksheet
+              </a>
+            )}
+
+            {profile.marksheet12ITI && (
+              <a 
+                href={`http://localhost:8080${profile.marksheet12ITI}`} 
+                target="_blank" 
+                rel="noreferrer"
+                className="block w-full text-center px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold hover:bg-slate-50 transition-colors shadow-sm"
+              >
+                <FileBadge className="w-4 h-4 inline-block mr-2 text-secondary" />
+                12th / ITI Marksheet
               </a>
             )}
           </div>

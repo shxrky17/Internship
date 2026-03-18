@@ -1,5 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  Briefcase, 
+  Twitter, 
+  Linkedin, 
+  Instagram, 
+  Send 
+} from 'lucide-react';
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -25,7 +32,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white shadow-lg">
-                <i data-lucide="briefcase" className="w-5 h-5"></i>
+                <Briefcase className="w-5 h-5" />
               </div>
               <span className="text-xl font-heading font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
                 PM Internship
@@ -36,13 +43,13 @@ const Footer = () => {
             </p>
             <div className="flex gap-4">
               <a href="#" className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition-all">
-                <i data-lucide="twitter" className="w-4 h-4"></i>
+                <Twitter className="w-4 h-4" />
               </a>
               <a href="#" className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition-all">
-                <i data-lucide="linkedin" className="w-4 h-4"></i>
+                <Linkedin className="w-4 h-4" />
               </a>
               <a href="#" className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition-all">
-                <i data-lucide="instagram" className="w-4 h-4"></i>
+                <Instagram className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -85,7 +92,7 @@ const Footer = () => {
                 className="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm flex-1 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
               />
               <button className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md group">
-                <i data-lucide="send" className="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>

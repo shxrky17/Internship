@@ -11,21 +11,9 @@
     <!-- Main Styles -->
     <link rel="stylesheet" href="/src/styles/index.css">
     
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script>
-        // Initialize Lucide icons after mount
-        document.addEventListener("DOMContentLoaded", () => {
-            setInterval(() => {
-                if (window.lucide) {
-                   lucide.createIcons();
-                }
-            }, 500);
-        });
-    </script>
 </body>
 </html>

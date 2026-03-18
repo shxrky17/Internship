@@ -87,7 +87,7 @@ export const AuthProvider = ({ children, showToast }) => {
   };
 
   const updateProfile = async (newProfileData) => {
-    setProfile(newProfileData);
+    setProfile(prev => ({ ...(prev || {}), ...newProfileData }));
     // Optionally refetch from server to be sure
     await fetchProfile();
   };

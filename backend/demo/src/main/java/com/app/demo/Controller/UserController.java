@@ -6,12 +6,19 @@ import com.app.demo.Entity.User;
 import com.app.demo.Repository.ProfileRepository;
 import com.app.demo.Repository.UserRepository;
 import com.app.demo.Service.UserService;
+import com.app.demo.Service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
 import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -27,6 +34,11 @@ public class UserController {
     @Autowired
     private ProfileRepository profileRepository;
 
+    @Autowired
+    private FileStorageService fileStorageService;
+
+    private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegisterDTO userRegisterDTO) {
         String email = userRegisterDTO.getEmail();
@@ -36,13 +48,14 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
 
+        userRegisterDTO.setEmail(email.trim().toLowerCase());
         return ResponseEntity.ok(userService.register(userRegisterDTO));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletRequest request, HttpServletResponse response) {
 
-        String email = loginRequestDTO.getEmail();
+        String email = loginRequestDTO.getEmail().trim().toLowerCase();
 
         User user = userRepository.findByEmail(email);
 
@@ -59,16 +72,28 @@ public class UserController {
 
         // Store it in Security Context
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        LoginResponseDTO response = new LoginResponseDTO("Login successful", true);
 
-        return ResponseEntity.ok(response);
+        // Required in Spring Security 6+ for manual authentication persistence
+        securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+
+        LoginResponseDTO loginResponse = new LoginResponseDTO("Login successful", true);
+
+        return ResponseEntity.ok(loginResponse);
     }
 
-    @PostMapping("/add-details")
-    public ResponseEntity<String> addDetails(@RequestBody Profile profile) {
+    @PostMapping(value = "/add-details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> addDetails(
+            @RequestPart("profile") Profile profile,
+            @RequestPart(value = "resume", required = false) MultipartFile resume,
+            @RequestPart(value = "marksheet10", required = false) MultipartFile marksheet10,
+            @RequestPart(value = "marksheet12ITI", required = false) MultipartFile marksheet12ITI
+    ) {
 
         // get logged-in user email
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
+            return ResponseEntity.status(401).body("User not athenticated. Please log in.");
+        }
         String email = auth.getName().trim().toLowerCase();
 
         System.out.println("[DEBUG] add-details email: " + email);
@@ -96,7 +121,21 @@ public class UserController {
         p.setGender(profile.getGender());
         p.setDistrict(profile.getDistrict());
         p.setState(profile.getState());
-        p.setCv(profile.getCv());
+        
+        // Handle files
+        if (resume != null && !resume.isEmpty()) {
+            if (p.getCv() != null) fileStorageService.deleteFile(p.getCv());
+            p.setCv(fileStorageService.storeFile(resume, email + "_resume"));
+        }
+        if (marksheet10 != null && !marksheet10.isEmpty()) {
+            if (p.getMarksheet10() != null) fileStorageService.deleteFile(p.getMarksheet10());
+            p.setMarksheet10(fileStorageService.storeFile(marksheet10, email + "_marksheet10"));
+        }
+        if (marksheet12ITI != null && !marksheet12ITI.isEmpty()) {
+            if (p.getMarksheet12ITI() != null) fileStorageService.deleteFile(p.getMarksheet12ITI());
+            p.setMarksheet12ITI(fileStorageService.storeFile(marksheet12ITI, email + "_marksheet12ITI"));
+        }
+
         p.setHighestQualification(profile.getHighestQualification());
         p.setFieldOfStudy(profile.getFieldOfStudy());
         p.setClgName(profile.getClgName());
@@ -111,10 +150,63 @@ public class UserController {
         return ResponseEntity.ok("Profile details saved successfully");
     }
 
+    @PostMapping(value = "/upload-document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadDocument(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("documentType") String documentType
+    ) {
+        // get logged-in user email
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
+            return ResponseEntity.status(401).body("User not authenticated.");
+        }
+        String email = auth.getName().trim().toLowerCase();
+
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(401).body("User not found.");
+        }
+
+        Profile p = profileRepository.findByUser(user).orElse(null);
+        if (p == null) {
+            p = new Profile();
+            p.setUser(user);
+        }
+
+        String filePath = fileStorageService.storeFile(file, email + "_" + documentType);
+        if (filePath == null) {
+            return ResponseEntity.badRequest().body("Failed to store file or file is empty.");
+        }
+
+        switch (documentType) {
+            case "resume":
+                if (p.getCv() != null) fileStorageService.deleteFile(p.getCv());
+                p.setCv(filePath);
+                break;
+            case "marksheet10":
+                if (p.getMarksheet10() != null) fileStorageService.deleteFile(p.getMarksheet10());
+                p.setMarksheet10(filePath);
+                break;
+            case "marksheet12ITI":
+                if (p.getMarksheet12ITI() != null) fileStorageService.deleteFile(p.getMarksheet12ITI());
+                p.setMarksheet12ITI(filePath);
+                break;
+            default:
+                return ResponseEntity.badRequest().body("Invalid document type.");
+        }
+
+        profileRepository.save(p);
+        return ResponseEntity.ok(filePath);
+    }
+
     @PostMapping("/get-profile")
     public ResponseEntity<User> getProfile() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = "john.111doe@example1.com";
+        if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
+            System.err.println("[ERROR] get-profile: User not authenticated");
+            return ResponseEntity.status(401).build();
+        }
+        String email = auth.getName().trim().toLowerCase();
 
         System.out.println("[DEBUG] get-profile email: " + email);
 

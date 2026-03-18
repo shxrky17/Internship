@@ -21,6 +21,8 @@ public class Profile {
     private String skills;
     private String languages;
     private String bio;
+    private String marksheet10;
+    private String marksheet12ITI;
 
     @JsonIgnore
     @OneToOne(optional = false)
@@ -147,10 +149,26 @@ public class Profile {
         this.bio = bio;
     }
 
+    public String getMarksheet10() {
+        return marksheet10;
+    }
+
+    public void setMarksheet10(String marksheet10) {
+        this.marksheet10 = marksheet10;
+    }
+
+    public String getMarksheet12ITI() {
+        return marksheet12ITI;
+    }
+
+    public void setMarksheet12ITI(String marksheet12ITI) {
+        this.marksheet12ITI = marksheet12ITI;
+    }
+
     public Profile() {
     }
 
-    public Profile(Integer id, String dob, String phoneNumber, String gender, String district, String cv, String state, String highestQualification, String fieldOfStudy, String gradYear, String clgName, String skills, String languages, String bio, User user) {
+    public Profile(Integer id, String dob, String phoneNumber, String gender, String district, String cv, String state, String highestQualification, String fieldOfStudy, String gradYear, String clgName, String skills, String languages, String bio, String marksheet10, String marksheet12ITI, User user) {
         this.id = id;
         this.dob = dob;
         this.phoneNumber = phoneNumber;
@@ -165,6 +183,8 @@ public class Profile {
         this.skills = skills;
         this.languages = languages;
         this.bio = bio;
+        this.marksheet10 = marksheet10;
+        this.marksheet12ITI = marksheet12ITI;
         this.user = user;
     }
 }
