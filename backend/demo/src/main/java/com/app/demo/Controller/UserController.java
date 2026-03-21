@@ -84,9 +84,9 @@ public class UserController {
     @PostMapping(value = "/add-details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> addDetails(
             @RequestPart("profile") Profile profile,
-            @RequestPart(value = "resume", required = false) MultipartFile resume,
-            @RequestPart(value = "marksheet10", required = false) MultipartFile marksheet10,
-            @RequestPart(value = "marksheet12ITI", required = false) MultipartFile marksheet12ITI
+            @RequestPart(value = "resume", required = true) MultipartFile resume,
+            @RequestPart(value = "marksheet10", required = true) MultipartFile marksheet10,
+            @RequestPart(value = "marksheet12ITI", required = true) MultipartFile marksheet12ITI
     ) {
 
         // get logged-in user email
@@ -100,14 +100,14 @@ public class UserController {
 
         // find user from database
         User user = userRepository.findByEmail(email);
-
+        int uId=user.getId();
         if (user == null) {
             System.err.println("[ERROR] User not found for email: " + email);
             return ResponseEntity.status(401).body("User not found or session expired. Please log in again.");
         }
 
         // find existing profile
-        Profile p = profileRepository.findByUser(user).orElse(null);
+        Profile p = profileRepository.findByUserId(uId);
 
         if (p == null) {
             // create new profile if none exists
@@ -144,8 +144,23 @@ public class UserController {
         p.setLanguages(profile.getLanguages());
         p.setBio(profile.getBio());
 
+        // Also map file paths from the JSON payload if they exist and no new file was uploaded
+        // This ensures "Instant Uploads" are not lost when the main form is saved
+        if ((resume == null || resume.isEmpty()) && profile.getCv() != null && !profile.getCv().isEmpty()) {
+            p.setCv(profile.getCv());
+        }
+        if ((marksheet10 == null || marksheet10.isEmpty()) && profile.getMarksheet10() != null && !profile.getMarksheet10().isEmpty()) {
+            p.setMarksheet10(profile.getMarksheet10());
+        }
+        if ((marksheet12ITI == null || marksheet12ITI.isEmpty()) && profile.getMarksheet12ITI() != null && !profile.getMarksheet12ITI().isEmpty()) {
+            p.setMarksheet12ITI(profile.getMarksheet12ITI());
+        }
+
         // save profile
         profileRepository.save(p);
+        
+        // Ensure bidirectional relationship is set in the current session
+        user.setProfile(p);
 
         return ResponseEntity.ok("Profile details saved successfully");
     }
@@ -200,7 +215,7 @@ public class UserController {
     }
 
     @PostMapping("/get-profile")
-    public ResponseEntity<User> getProfile() {
+    public ResponseEntity<UserResponseDTO> getProfile() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
             System.err.println("[ERROR] get-profile: User not authenticated");
@@ -216,8 +231,43 @@ public class UserController {
             return ResponseEntity.status(401).build();
         }
 
-        // The user object naturally contains the profile due to @OneToOne relationship.
-        // Jackson will serialize the nested profile automatically.
-        return ResponseEntity.ok(user);
+        // Explicitly load the profile to ensure Jackson serializes it
+        Profile profile = user.getProfile();
+        if (profile == null) {
+            profile = profileRepository.findByUser(user).orElse(null);
+            if (profile != null) {
+                user.setProfile(profile);
+            }
+        }
+        
+        // Map to DTO for reliable serialization
+        UserResponseDTO response = new UserResponseDTO();
+        response.setId(user.getId());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setEmail(user.getEmail());
+        
+        if (profile != null) {
+            ProfileDTO pDto = new ProfileDTO();
+            pDto.setId(profile.getId());
+            pDto.setDob(profile.getDob());
+            pDto.setPhoneNumber(profile.getPhoneNumber());
+            pDto.setGender(profile.getGender());
+            pDto.setDistrict(profile.getDistrict());
+            pDto.setState(profile.getState());
+            pDto.setCv(profile.getCv());
+            pDto.setHighestQualification(profile.getHighestQualification());
+            pDto.setFieldOfStudy(profile.getFieldOfStudy());
+            pDto.setClgName(profile.getClgName());
+            pDto.setGradYear(profile.getGradYear());
+            pDto.setSkills(profile.getSkills());
+            pDto.setLanguages(profile.getLanguages());
+            pDto.setBio(profile.getBio());
+            pDto.setMarksheet10(profile.getMarksheet10());
+            pDto.setMarksheet12ITI(profile.getMarksheet12ITI());
+            response.setProfile(pDto);
+        }
+        
+        return ResponseEntity.ok(response);
     }
 }

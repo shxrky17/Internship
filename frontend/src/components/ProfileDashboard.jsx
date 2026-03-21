@@ -16,7 +16,7 @@ const ProfileDashboard = ({ user, profile, isInitializing, onOpenSignIn, showToa
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isInitializing) return; // Wait for initial profile fetch attempt
+    if (isInitializing) return; 
 
     if (!user) {
       showToast('Please login to view your dashboard.', 'warning');
@@ -28,7 +28,7 @@ const ProfileDashboard = ({ user, profile, isInitializing, onOpenSignIn, showToa
     }
   }, [user, profile, navigate, onOpenSignIn, showToast, isInitializing]);
 
-  if (!user || !profile) return null;
+
 
   const sectionClass = "glass-panel p-6 rounded-2xl border border-white/40 shadow-sm mb-6";
   const labelClass = "text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block";

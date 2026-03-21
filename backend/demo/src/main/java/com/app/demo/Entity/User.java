@@ -17,7 +17,7 @@ public class User {
     private String email;
     private String password;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private Profile profile;
 
     public Integer getId() {
@@ -58,5 +58,12 @@ public class User {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+
+    public void setProfile(Profile profile) {
+    }
+
+    public Profile getProfile() {
+        return profile;
     }
 }

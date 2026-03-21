@@ -5,6 +5,7 @@ public class UserResponseDTO {
     private String firstName;
     private String lastName;
     private String email;
+    private ProfileDTO profile;
 
     public Integer getId() {
         return id;
@@ -36,5 +37,13 @@ public class UserResponseDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public ProfileDTO getProfile() {
+        return profile;
+    }
+
+    public void setProfile(ProfileDTO profile) {
+        this.profile = profile;
     }
 }

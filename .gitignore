@@ -21,7 +21,8 @@ lerna-debug.log*
 .env
 .env.*
 !.env.example
-
+__pycache__/
+extracted_texts/
 # OS/System files
 .DS_Store
 .DS_Store?
@@ -33,7 +34,7 @@ Thumbs.db
 
 # Testing
 coverage/
-
+venv/
 # IDEs and Editors
 .vscode/
 .idea/
