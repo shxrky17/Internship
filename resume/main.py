@@ -74,4 +74,4 @@ if __name__ == "__main__":
     print(len(embedding))
 
     print("\nFirst 10 embedding values:")
-    print(embedding[384])
+    print(embedding[:10])

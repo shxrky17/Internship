@@ -9,6 +9,8 @@ public class JobResponseDTO {
     private String location;
     private List<String> skills;
     private String generatedQuery;
+    private Integer embeddingLength;
+    private String message;
 
     public JobResponseDTO() {
     }
@@ -59,5 +61,21 @@ public class JobResponseDTO {
 
     public void setGeneratedQuery(String generatedQuery) {
         this.generatedQuery = generatedQuery;
+    }
+
+    public Integer getEmbeddingLength() {
+        return embeddingLength;
+    }
+
+    public void setEmbeddingLength(Integer embeddingLength) {
+        this.embeddingLength = embeddingLength;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

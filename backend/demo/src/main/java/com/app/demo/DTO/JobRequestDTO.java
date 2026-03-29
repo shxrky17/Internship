@@ -3,6 +3,7 @@ package com.app.demo.DTO;
 import java.util.List;
 
 public class JobRequestDTO{
+    private Integer id;
     private String title;
     private String company;
     private String location;
@@ -10,7 +11,8 @@ public class JobRequestDTO{
 
     public JobRequestDTO() {}
 
-    public JobRequestDTO(String title, String company, String location, List<String> skills) {
+    public JobRequestDTO(Integer id,String title, String company, String location, List<String> skills) {
+        this.id = id;
         this.title = title;
         this.company = company;
         this.location = location;
@@ -47,5 +49,14 @@ public class JobRequestDTO{
 
     public void setSkills(List<String> skills) {
         this.skills = skills;
+    }
+
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }
