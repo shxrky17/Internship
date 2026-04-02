@@ -16,9 +16,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('backend/demo') {
-                    // Using mvnw if available, else mvn
-                    sh 'chmod +x mvnw'
-                    sh './mvnw clean install -DskipTests'
+                    bat 'mvnw.cmd clean install -DskipTests'
                 }
             }
         }
@@ -26,8 +24,8 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
-                    sh 'npm install'
-                    sh 'npm run build'
+                    bat 'npm install'
+                    bat 'npm run build'
                 }
             }
         }
@@ -35,7 +33,7 @@ pipeline {
         stage('Test Backend') {
             steps {
                 dir('backend/demo') {
-                    sh './mvnw test'
+                    bat 'mvnw.cmd test'
                 }
             }
         }
