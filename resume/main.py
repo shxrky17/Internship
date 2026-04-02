@@ -11,11 +11,24 @@ import re
 from groq import Groq
 from dotenv import load_dotenv
 import warnings
+from pydantic import BaseModel
+from typing import List
+from sentence_transformers import SentenceTransformer
+from pinecone import Pinecone
 
+load_dotenv()
+
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "quickstart")
+PINECONE_NAMESPACE = os.getenv("PINECONE_NAMESPACE", "job-queries")
+
+pc = Pinecone(api_key=PINECONE_API_KEY)
+index = pc.Index(PINECONE_INDEX_NAME)
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-# Load environment variables
-load_dotenv()
+
 
 app = FastAPI(title="Resume Analyzer")
 app.add_middleware(
@@ -274,3 +287,71 @@ async def analyze_resume(file: UploadFile = File(...)):
             content={"error": str(e)},
             status_code=500
         )
+        
+        
+
+class JobRequest(BaseModel):
+    id: int
+    title: str
+    company: str
+    location: str
+    skills: List[str]
+
+def build_query(job: JobRequest) -> str:
+    return f"{job.title} at {job.company} in {job.location} with skills {' '.join(job.skills)}"
+
+def generate_embedding(text: str):
+    return model.encode(text).tolist()
+
+@app.post("/generate-query")
+def generate_query_and_store(job: JobRequest):
+    generated_query = build_query(job)
+    embedding = generate_embedding(generated_query)
+
+    index.upsert(
+        vectors=[{
+            "id": str(job.id),
+            "values": embedding,
+            "metadata": {
+                "title": job.title,
+                "company": job.company,
+                "location": job.location,
+                "skills": job.skills,
+                "generated_query": generated_query
+            }
+        }],
+        namespace=PINECONE_NAMESPACE
+    )
+
+    return {
+        "message": "Stored successfully",
+        "query": generated_query
+    }
+    
+@app.get("/search")
+def search_similar_jobs(query: str, top_k: int = 3):
+    try:
+        query_embedding = generate_embedding(query)
+
+        results = index.query(
+            vector=query_embedding,
+            top_k=top_k,
+            include_metadata=True,
+            namespace=PINECONE_NAMESPACE
+        )
+
+        matches = []
+        for match in results.get("matches", []):
+            matches.append({
+                "id": match.get("id"),
+                "score": match.get("score"),
+                "metadata": match.get("metadata", {})
+            })
+
+        return {
+            "query": query,
+            "top_k": top_k,
+            "matches": matches
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

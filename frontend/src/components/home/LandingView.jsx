@@ -1,39 +1,17 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import GalleryCarousel from './GalleryCarousel';
-import { 
-  Sparkles, 
-  Search, 
-  Target, 
-  MapPin, 
-  CheckCircle, 
-  UserPen, 
-  ArrowRight, 
-  Info, 
-  Mail, 
-  Phone 
+import {
+  Sparkles,
+  Search,
+  Target,
+  MapPin,
+  CheckCircle,
+  Info,
+  Mail,
+  Phone
 } from 'lucide-react';
 
-const LandingView = ({ onOpenSignIn }) => {
-  const navigate = useNavigate();
-  const { user, profile } = useAuth();
-
-  const handleApplyClick = () => {
-    if (!user) {
-      onOpenSignIn();
-    } else {
-      navigate('/add-details');
-    }
-  };
-
-  const handleProfileCardClick = () => {
-    if (!user) {
-      onOpenSignIn();
-    } else {
-      navigate('/add-details');
-    }
-  };
+const LandingView = () => {
 
   return (
     <div className="glass-panel overflow-hidden max-w-7xl mx-auto mt-8 py-12 px-8 text-center bg-white/60">
@@ -46,8 +24,8 @@ const LandingView = ({ onOpenSignIn }) => {
         </p>
 
         <div className="flex gap-4 justify-center flex-wrap mb-12">
-          <button onClick={handleApplyClick} className="btn btn-primary text-lg px-8 py-4">
-            <Sparkles className="w-5 h-5" /> 
+          <button className="btn btn-primary text-lg px-8 py-4">
+            <Sparkles className="w-5 h-5" />
             Find Matches Now
           </button>
           <button className="btn btn-secondary text-lg px-8 py-4">
@@ -59,7 +37,7 @@ const LandingView = ({ onOpenSignIn }) => {
           <div className="glass-panel p-6">
             <Target className="text-primary mb-4 w-8 h-8" />
             <h3 className="mb-2 text-xl font-bold">Smart Matching</h3>
-            <p className="text-sm text-text-muted">Get personalized recommendations based on your unique profile.</p>
+            <p className="text-sm text-text-muted">Get personalized recommendations based on your education, skills, and preferences.</p>
           </div>
           <div className="glass-panel p-6">
             <MapPin className="text-secondary mb-4 w-8 h-8" />
@@ -71,24 +49,14 @@ const LandingView = ({ onOpenSignIn }) => {
             <h3 className="mb-2 text-xl font-bold">Simple Process</h3>
             <p className="text-sm text-text-muted">No complex forms. Just tell us what you know, and we do the hard work.</p>
           </div>
-          <div
-            className="glass-panel p-6 cursor-pointer hover:ring-2 hover:ring-primary/40 hover:shadow-lg transition-all duration-200 group"
-            onClick={handleProfileCardClick}
-          >
-            
-            <UserPen className="text-purple-500 mb-4 w-8 h-8 group-hover:scale-110 transition-transform" />
-            <h3 className="mb-2 text-xl font-bold group-hover:text-primary transition-colors">
-              Update Your Profile
-            </h3>
-            <p className="text-sm text-text-muted">Add your education, skills, and location to get better matches.</p>
-            <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
-              Add Details <ArrowRight className="w-3 h-3" />
-            </span>
+          <div className="glass-panel p-6">
+            <Sparkles className="text-primary mb-4 w-8 h-8" />
+            <h3 className="mb-2 text-xl font-bold">Faster Discovery</h3>
+            <p className="text-sm text-text-muted">Explore opportunities quickly with a simpler application experience.</p>
           </div>
         </div>
 
       </div>
-      {/* About Section */}
       <div id="about" className="mt-24 pt-12 border-t border-slate-200/60 max-w-5xl mx-auto">
         <div className="flex flex-col md:flex-row items-center gap-12 text-left">
           <div className="flex-1">
@@ -105,9 +73,9 @@ const LandingView = ({ onOpenSignIn }) => {
           </div>
           <div className="flex-1 w-full max-w-md">
             <div className="glass-panel p-2 bg-gradient-to-br from-primary/10 to-secondary/10">
-              <img 
-                src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=1974&auto=format&fit=crop" 
-                alt="About Internship" 
+              <img
+                src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=1974&auto=format&fit=crop"
+                alt="About Internship"
                 className="rounded-xl shadow-md grayscale hover:grayscale-0 transition-all duration-500"
               />
             </div>
@@ -115,13 +83,11 @@ const LandingView = ({ onOpenSignIn }) => {
         </div>
       </div>
 
-      {/* Gallery Section */}
       <div id="gallery" className="mt-24 pt-12 max-w-7xl mx-auto overflow-hidden">
         <h2 className="text-3xl font-heading font-bold mb-10 text-primary text-center">Success Gallery</h2>
         <GalleryCarousel />
       </div>
 
-      {/* Contact Section */}
       <div id="contact" className="mt-24 pt-12 mb-12 max-w-5xl mx-auto">
         <h2 className="text-3xl font-heading font-bold mb-10 text-primary text-center">Get In Touch</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">

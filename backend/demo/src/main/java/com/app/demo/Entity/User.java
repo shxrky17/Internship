@@ -1,6 +1,11 @@
 package com.app.demo.Entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
@@ -16,9 +21,6 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
     private String password;
-
-    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
-    private Profile profile;
 
     public Integer getId() {
         return id;
@@ -58,12 +60,5 @@ public class User {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
-    }
-
-    public void setProfile(Profile profile) {
-    }
-
-    public Profile getProfile() {
-        return profile;
     }
 }

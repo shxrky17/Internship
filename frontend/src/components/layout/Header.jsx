@@ -1,33 +1,72 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '../context/AuthContext';
-import { 
-  Briefcase, 
-  Home, 
-  Info, 
-  Phone, 
-  LayoutDashboard, 
-  Mic, 
-  Languages, 
-  LogOut 
+import { useAuth } from '../../context/AuthContext';
+import {
+  Briefcase,
+  Home,
+  Info,
+  Phone,
+  Mic,
+  Languages,
+  LogOut
 } from 'lucide-react';
+import { Button } from '../ui/button';
 
-const Header = ({ onOpenSignIn, onOpenSignUp, onLogout }) => {
+const Header = ({ onOpenSignIn, onOpenSignUp }) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  
+  const { user, logout } = useAuth();
+
   const handleScrollTo = (id) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     } else {
       navigate('/');
-      // Wait for navigation and then scroll
       setTimeout(() => {
         const el = document.getElementById(id);
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       }, 100);
+    }
+  };
+const handleLogout = async () => {
+  try {
+    await fetch("http://localhost:8081/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    alert("Logged out ✅");
+
+    // optional: redirect or reset state
+    window.location.href = "/";
+    window.location.reload();
+  } catch (err) {
+    console.error("Logout failed", err);
+  }
+};
+  const handleCheckSession = async () => {
+    try {
+      const response = await fetch('http://localhost:8081/me', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        window.alert('No active session from /me');
+        return;
+      }
+
+      const data = await response.json();
+      if (data?.email) {
+        window.alert(`Spring Boot /me: ${data.lastName}`);
+        return;
+      }
+
+      window.alert('Spring Boot /me responded without user data');
+      return;
+    } catch (error) {
+      window.alert('Failed to call Spring Boot /me');
     }
   };
 
@@ -64,15 +103,6 @@ const Header = ({ onOpenSignIn, onOpenSignUp, onLogout }) => {
               </div>
               <p className="m-0 group-hover:text-primary">Contact</p>
             </div>
-
-            {user && (
-              <div onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-black font-semibold text-base cursor-pointer hover:text-primary transition-all group">
-                <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
-                  <LayoutDashboard className="w-4 h-4 text-primary" />
-                </div>
-                <p className="m-0 group-hover:text-primary">Dashboard</p>
-              </div>
-            )}
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -82,12 +112,12 @@ const Header = ({ onOpenSignIn, onOpenSignUp, onLogout }) => {
           <button className="bg-transparent border-none text-text-muted cursor-pointer p-2 rounded-full transition-all duration-200 flex items-center justify-center hover:bg-slate-100 hover:text-primary" aria-label="Change Language">
             <Languages className="w-5 h-5" />
           </button>
-
+          <Button variant="outline" onClick={handleCheckSession}>
+            Check /me
+          </Button>
           {user ? (
             <div className="flex items-center gap-3">
-              <div 
-                className="flex items-center gap-2 p-1 rounded-full transition-colors"
-              >
+              <div className="flex items-center gap-2 p-1 rounded-full transition-colors">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm font-bold shadow-sm">
                   {user.email.charAt(0).toUpperCase()}
                 </div>
@@ -96,7 +126,7 @@ const Header = ({ onOpenSignIn, onOpenSignUp, onLogout }) => {
                 </span>
               </div>
               <button
-                onClick={onLogout}
+                onClick={handleLogout}
                 className="bg-transparent border border-slate-200 text-text-muted cursor-pointer py-1.5 px-3 rounded-full text-sm transition-all duration-200 hover:bg-red-50 hover:text-red-500 hover:border-red-200 hidden sm:flex items-center gap-1.5"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -105,10 +135,10 @@ const Header = ({ onOpenSignIn, onOpenSignUp, onLogout }) => {
             </div>
           ) : (
             <>
-              <button onClick={onOpenSignIn} className="btn btn-signin hidden sm:inline-flex py-2 px-4">
+              <Button variant="secondary" onClick={onOpenSignIn}>
                 Sign In
-              </button>
-              <Button onClick={onOpenSignUp} variant="default" className="hidden sm:inline-flex py-2 px-4 bg-purple-500 hover:bg-purple-600 text-white rounded-full">
+              </Button>
+              <Button variant="outline" onClick={onOpenSignUp}>
                 Sign Up
               </Button>
             </>
