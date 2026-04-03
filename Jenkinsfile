@@ -5,7 +5,17 @@ pipeline {
         maven 'Maven 3.8.6'
         nodejs 'node 18'
     }
-
+stage('Find Python') {
+    steps {
+        bat 'echo %USERNAME%'
+        bat 'whoami'
+        bat 'where python'
+        bat 'where py'
+        bat 'dir "C:\\Users\\Yash\\AppData\\Local\\Programs\\Python"'
+        bat 'dir "C:\\Program Files"'
+        bat 'dir "C:\\Python*"'
+    }
+}
     stages {
         stage('Checkout') {
             steps {
