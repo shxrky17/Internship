@@ -37,7 +37,7 @@ stage('Check Python') {
         stage('Build python backend') {
             steps {
                 dir('resume') {
-                    bat '"C:\\Users\\Yash\\AppData\\Local\\Programs\\Python\\Python313\\python.exe" -m py_compile main.py'
+                    bat 'py -m py_compile main.py'
                 }
             }
         }
