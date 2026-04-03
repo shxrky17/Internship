@@ -29,6 +29,14 @@ pipeline {
                 }
             }
         }
+        stage('Build python backend') {
+            steps {
+                dir('resume') {
+                    bat 'python -m py_compile main.py'
+                }
+            }
+        }
+
 
         stage('Test Backend') {
             steps {
