@@ -32,7 +32,7 @@ pipeline {
         stage('Build python backend') {
             steps {
                 dir('resume') {
-                    bat 'python -m py_compile main.py'
+                    bat '"C:\\Users\\Yash\\AppData\\Local\\Programs\\Python\\Python313\\python.exe" -m py_compile main.py'
                 }
             }
         }
