@@ -5,6 +5,13 @@ pipeline {
         maven 'Maven 3.8.6'
         nodejs 'node 18'
     }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
 stage('Find Python') {
     steps {
         bat 'echo %USERNAME%'
@@ -16,13 +23,6 @@ stage('Find Python') {
         bat 'dir "C:\\Python*"'
     }
 }
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build Backend') {
             steps {
                 dir('backend/demo') {
