@@ -12,21 +12,24 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            http
+                    .csrf(csrf -> csrf.disable())
+                    .authorizeHttpRequests(auth -> auth
+                            .requestMatchers(
+                                    "/actuator/health",
+                                    "/actuator/info",
+                                    "/actuator/prometheus"
+                            ).permitAll()
+                            .requestMatchers("/login", "/register", "/create-job", "/me").permitAll()
+                            .requestMatchers("/me").authenticated()
+                            .anyRequest().authenticated()
+                    )
+                    .formLogin(form -> form.disable());
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/create-job","/me").permitAll()
-                        .requestMatchers("/me").authenticated()
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form.disable());
-
-        return http.build();
-    }
+            return http.build();
+        }
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
