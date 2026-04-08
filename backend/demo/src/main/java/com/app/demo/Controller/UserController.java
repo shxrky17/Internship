@@ -4,7 +4,9 @@ import com.app.demo.DTO.LoginRequestDTO;
 import com.app.demo.DTO.LoginResponseDTO;
 import com.app.demo.DTO.UserRegisterDTO;
 import com.app.demo.DTO.UserResponseDTO;
+import com.app.demo.Entity.Profile;
 import com.app.demo.Entity.User;
+import com.app.demo.Repository.ProfileRepository;
 import com.app.demo.Repository.UserRepository;
 import com.app.demo.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,14 +18,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 public class UserController {
+
+    @Autowired
+    private ProfileRepository profileRepository;
 
     @Autowired
     private UserService userService;
@@ -101,5 +105,26 @@ public ResponseEntity<?> logout(HttpServletRequest request,
         response.setLastName(user.getLastName());
         response.setEmail(user.getEmail());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get-profile")
+    public ResponseEntity<?> getProfile() {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName().trim().toLowerCase();
+
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+
+        Optional<Profile> profileOpt = Optional.ofNullable(profileRepository.getProfileByUserId(user.getId()));
+
+        if (profileOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("Profile does not exist");
+        }
+
+        return ResponseEntity.ok(profileOpt.get());
     }
 }

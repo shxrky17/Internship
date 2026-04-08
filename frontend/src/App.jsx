@@ -2,10 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import LandingView from './components/home/LandingView';
-import Marquee from "./components/home/Marquee";
-import Footer from "./components/layout/Footer";
+import Marquee from './components/home/Marquee';
+import Footer from './components/layout/Footer';
 import Signin from './components/layout/user/Signin';
 import Signup from './components/layout/user/Signup';
+import Profile from './components/layout/user/Profile';
 import { useAuth } from './context/AuthContext';
 
 const AppContent = () => {
@@ -35,23 +36,46 @@ const AppContent = () => {
                 onOpenSignIn={openSignIn}
                 onOpenSignUp={openSignUp}
               />
-              <div className={authModal ? 'blur-sm transition-all duration-300' : 'transition-all duration-300'}>
+
+              <div
+                className={
+                  authModal
+                    ? 'blur-sm transition-all duration-300'
+                    : 'transition-all duration-300'
+                }
+              >
                 <LandingView />
+                <Marquee />
+                <Footer />
               </div>
-              <Marquee />
-              <Footer />
+
               {authModal === 'signin' && (
                 <Signin
                   onClose={closeAuthModal}
                   onSwitchToSignUp={openSignUp}
                 />
               )}
+
               {authModal === 'signup' && (
                 <Signup
                   onClose={closeAuthModal}
                   onSwitchToSignIn={openSignIn}
                 />
               )}
+            </div>
+          }
+        />
+
+        <Route
+          path="/add-profile"
+          element={
+            <div>
+              <Header
+                onOpenSignIn={openSignIn}
+                onOpenSignUp={openSignUp}
+              />
+              <Profile />
+              <Footer />
             </div>
           }
         />
