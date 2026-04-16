@@ -22,7 +22,7 @@ public class SecurityConfig {
                                     "/actuator/info",
                                     "/actuator/prometheus"
                             ).permitAll()
-                            .requestMatchers("/login", "/register", "/create-job", "/me","/add-profile").permitAll()
+                            .requestMatchers("/login", "/register", "/create-job", "/me","/add-profile","/upload").permitAll()
                             .requestMatchers("/me").authenticated()
                             .anyRequest().authenticated()
                     )

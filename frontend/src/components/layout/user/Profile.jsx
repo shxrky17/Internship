@@ -8,7 +8,9 @@ function Profile() {
     state: '',
   });
 
-  const [message, setMessage] = useState('');
+  const [file, setFile] = useState(null);
+  const [profileMessage, setProfileMessage] = useState('');
+  const [uploadMessage, setUploadMessage] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,6 +18,10 @@ function Profile() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
@@ -32,20 +38,52 @@ function Profile() {
       });
 
       if (response.ok) {
-        setMessage('Profile added successfully ✅');
-
+        setProfileMessage('Profile added successfully ✅');
         setFormData({
+          id: '',
           phoneNumber: '',
           gender: '',
           state: '',
         });
       } else {
         const errorText = await response.text();
-        setMessage(`Failed: ${errorText}`);
+        setProfileMessage(`Failed: ${errorText}`);
       }
     } catch (error) {
       console.error(error);
-      setMessage('Something went wrong');
+      setProfileMessage('Something went wrong while adding profile');
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      setUploadMessage('Please select a PDF');
+      return;
+    }
+
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+
+    try {
+      const response = await fetch('http://localhost:8081/upload', {
+        method: 'POST',
+        body: uploadData,
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUploadMessage('File uploaded successfully ✅');
+        console.log('Upload response:', data);
+        setFile(null);
+      } else {
+        setUploadMessage(`Upload failed ❌ ${data.error || ''}`);
+        console.error(data);
+      }
+    } catch (error) {
+      console.error(error);
+      setUploadMessage('Error uploading file');
     }
   };
 
@@ -54,6 +92,14 @@ function Profile() {
       <h1 className="text-2xl font-bold mb-6">Add Profile</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          name="id"
+          placeholder="ID"
+          value={formData.id}
+          onChange={handleChange}
+          className="w-full border p-3 rounded"
+        />
 
         <input
           type="text"
@@ -90,7 +136,28 @@ function Profile() {
         </button>
       </form>
 
-      {message && <p className="mt-4">{message}</p>}
+      {profileMessage && <p className="mt-4">{profileMessage}</p>}
+
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-4">Upload PDF</h2>
+
+        <input
+          type="file"
+          accept="application/pdf"
+          onChange={handleFileChange}
+          className="w-full border p-3 rounded"
+        />
+
+        <button
+          type="button"
+          onClick={handleUpload}
+          className="mt-4 bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
+        >
+          Upload PDF
+        </button>
+
+        {uploadMessage && <p className="mt-4">{uploadMessage}</p>}
+      </div>
     </div>
   );
 }
