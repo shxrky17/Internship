@@ -8,6 +8,7 @@ import Signin from './components/layout/user/Signin';
 import Signup from './components/layout/user/Signup';
 import Profile from './components/layout/user/Profile';
 import { useAuth } from './context/AuthContext';
+import SearchJobs from './components/home/SearchJobs';
 
 const AppContent = () => {
   const [authModal, setAuthModal] = useState(null);
@@ -28,6 +29,7 @@ const AppContent = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/get-jobs" element={<SearchJobs />} />
         <Route
           path="/"
           element={

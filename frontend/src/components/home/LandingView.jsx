@@ -1,5 +1,6 @@
 import React from 'react';
 import GalleryCarousel from './GalleryCarousel';
+import { useNavigate } from "react-router-dom";
 import {
   Sparkles,
   Search,
@@ -12,7 +13,7 @@ import {
 } from 'lucide-react';
 
 const LandingView = () => {
-
+const navigate = useNavigate();
   return (
     <div className="glass-panel overflow-hidden max-w-7xl mx-auto mt-8 py-12 px-8 text-center bg-white/60">
       <div className="max-w-4xl mx-auto">
@@ -24,7 +25,7 @@ const LandingView = () => {
         </p>
 
         <div className="flex gap-4 justify-center flex-wrap mb-12">
-          <button className="btn btn-primary text-lg px-8 py-4">
+          <button onClick={() => navigate("/get-jobs")} className="btn btn-primary text-lg px-8 py-4">
             <Sparkles className="w-5 h-5" />
             Find Matches Now
           </button>

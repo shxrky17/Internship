@@ -51,7 +51,6 @@ public class UserService {
                 requestEntity,
                 Map.class
         );
-
         return response.getBody();
     }
     public UserResponseDTO register(UserRegisterDTO userRegisterDTO) {
