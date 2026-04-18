@@ -111,7 +111,11 @@ def save_to_pinecone(job: JobRequest, generated_query: str, embedding: List[floa
     )
 
 
-def search_jobs_by_query(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
+def search_jobs_by_query(
+    query: str,
+    top_k: int = 5,
+    max_score: float = 2.5
+) -> List[Dict[str, Any]]:
     query_embedding = generate_embedding(query)
 
     results = index.query(
@@ -123,13 +127,16 @@ def search_jobs_by_query(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
 
     matches = []
     for match in results.get("matches", []):
-        matches.append(
-            {
-                "id": match.get("id"),
-                "score": match.get("score"),
-                "metadata": match.get("metadata", {}),
-            }
-        )
+        score = match.get("score", 0)
+
+        if score < max_score:
+            matches.append(
+                {
+                    "id": match.get("id"),
+                    "score": score,
+                    "metadata": match.get("metadata", {}),
+                }
+            )
 
     return matches
 
@@ -283,12 +290,10 @@ def build_query_from_resume(structured_json: Dict[str, Any], all_skills: List[st
     """
     parts: List[str] = []
 
-    # Summary
     summary = structured_json.get("summary", "")
     if summary:
         parts.append(summary)
 
-    # Experience roles
     experience = structured_json.get("experience", [])
     if isinstance(experience, list):
         for exp in experience[:3]:
@@ -297,7 +302,6 @@ def build_query_from_resume(structured_json: Dict[str, Any], all_skills: List[st
                 if job_title:
                     parts.append(job_title)
 
-    # Project titles
     projects = structured_json.get("projects", [])
     if isinstance(projects, list):
         for project in projects[:3]:
@@ -306,7 +310,6 @@ def build_query_from_resume(structured_json: Dict[str, Any], all_skills: List[st
                 if title:
                     parts.append(title)
 
-    # Technical skills + frameworks
     skills_obj = structured_json.get("skills", {})
     important_skills: List[str] = []
 
@@ -371,13 +374,18 @@ def generate_query_and_store(job: JobRequest) -> Dict[str, Any]:
 
 
 @app.get("/search")
-def search_similar_jobs(query: str, top_k: int = 3) -> Dict[str, Any]:
+def search_similar_jobs(
+    query: str,
+    top_k: int = 3,
+    max_score: float = 2.5
+) -> Dict[str, Any]:
     try:
-        matches = search_jobs_by_query(query, top_k)
+        matches = search_jobs_by_query(query, top_k, max_score)
 
         return {
             "query": query,
             "top_k": top_k,
+            "max_score": max_score,
             "matches": matches,
         }
     except Exception as exc:
@@ -454,7 +462,8 @@ async def analyze_resume(file: UploadFile = File(...)) -> JSONResponse:
 @app.post("/search-jobs-from-resume")
 async def search_jobs_from_resume(
     file: UploadFile = File(...),
-    top_k: int = 5
+    top_k: int = 5,
+    max_score: float = 2.5
 ) -> JSONResponse:
     try:
         if not file.filename:
@@ -472,7 +481,6 @@ async def search_jobs_from_resume(
         file_bytes = await file.read()
         file_like = BytesIO(file_bytes)
 
-        # Step 1: Extract resume text
         text = extract_text_from_pdf(file_like)
 
         if len(text.strip()) < 20:
@@ -484,7 +492,6 @@ async def search_jobs_from_resume(
                 content={"error": "Could not extract text from the resume"},
             )
 
-        # Step 2: Parse resume into structured JSON
         structured_json = await get_structured_resume_json(text)
         fallback_skills = extract_skills_from_text(text)
         all_skills = merge_skills(structured_json, fallback_skills)
@@ -492,17 +499,16 @@ async def search_jobs_from_resume(
         if "error" not in structured_json:
             structured_json["all_extracted_skills"] = all_skills
 
-        # Step 3: Build search query from resume
         resume_query = build_query_from_resume(structured_json, all_skills)
 
-        # Step 4: Search vector DB
-        matches = search_jobs_by_query(resume_query, top_k)
+        matches = search_jobs_by_query(resume_query, top_k, max_score)
 
         return JSONResponse(
             content={
                 "filename": file.filename,
                 "resume_query": resume_query,
                 "top_k": top_k,
+                "max_score": max_score,
                 "all_extracted_skills": all_skills,
                 "structured_json": structured_json,
                 "matches": matches,

@@ -6,7 +6,7 @@ function SearchJobs() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
-  const [resumeQuery, setResumeQuery] = useState("");
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -24,6 +24,7 @@ function SearchJobs() {
     setLoading(true);
     setError("");
     setJobs([]);
+    setHasSearched(false);
 
     try {
       const formData = new FormData();
@@ -40,7 +41,6 @@ function SearchJobs() {
       }
 
       const analyzeData = await analyzeResponse.json();
-      console.log("Resume analysis:", analyzeData);
 
       // Build query from backend response if backend returns resume_query
       let generatedQuery = analyzeData.resume_query;
@@ -52,9 +52,9 @@ function SearchJobs() {
         generatedQuery = `${summary} skills ${skills.slice(0, 15).join(" ")}`.trim();
       }
 
-      setResumeQuery(generatedQuery);
+      setHasSearched(true);
 
-      // Step 2: search jobs
+      // Step 2: search jobs using generated resume query
       const searchResponse = await fetch(
         `http://127.0.0.1:8000/search?query=${encodeURIComponent(generatedQuery)}&top_k=5`,
         {
@@ -67,9 +67,13 @@ function SearchJobs() {
       }
 
       const searchData = await searchResponse.json();
-      console.log("Job matches:", searchData);
 
-      setJobs(searchData.matches || []);
+      // Filter jobs: only keep jobs with score > 2.5
+      const filteredJobs = (searchData.matches || []).filter(
+        (job) => Number(job.score) > 0.35
+      );
+
+      setJobs(filteredJobs);
     } catch (err) {
       console.error(err);
       setError("Unable to load jobs from resume");
@@ -109,14 +113,6 @@ function SearchJobs() {
           </p>
         )}
 
-        {resumeQuery && (
-          <div className="mt-4">
-            <p className="font-medium mb-1">Generated Resume Query:</p>
-            <p className="text-sm text-gray-600 bg-gray-100 p-3 rounded-xl">
-              {resumeQuery}
-            </p>
-          </div>
-        )}
       </div>
 
       {loading && (
@@ -127,8 +123,10 @@ function SearchJobs() {
         <p className="text-center text-red-500">{error}</p>
       )}
 
-      {!loading && !error && jobs.length === 0 && resumeQuery && (
-        <p className="text-center text-gray-500">No jobs found.</p>
+      {!loading && !error && jobs.length === 0 && hasSearched && (
+        <p className="text-center text-gray-500">
+          No jobs found with score greater than 2.5.
+        </p>
       )}
 
       {!loading && !error && jobs.length > 0 && (
@@ -145,7 +143,7 @@ function SearchJobs() {
 
                 <span className="flex items-center gap-1 text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                   <Star className="w-4 h-4" />
-                  {job.score ? `${(job.score * 100).toFixed(1)}%` : "N/A"}
+                  {job.score !== undefined ? job.score.toFixed(3) : "N/A"}
                 </span>
               </div>
 
@@ -176,13 +174,6 @@ function SearchJobs() {
                       </span>
                     ))}
                   </div>
-                </div>
-
-                <div>
-                  <p className="font-medium mb-1">Generated Query:</p>
-                  <p className="text-sm text-gray-500">
-                    {job.metadata?.generated_query || "Not available"}
-                  </p>
                 </div>
               </div>
 
